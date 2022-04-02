@@ -1,0 +1,29 @@
+[
+  {
+    "h2": "Something in title"
+  },
+  {
+    "p": "An sehnen hinweggeschwunden mögt nennt euch. Verklungen gleich  hinweggeschwunden ich menge. Es mir bilder mich was folgt einst zu."
+  },
+  {
+    "p": "Herz wie vor seelen wohl den wird und zu. Meinem lied wird vor mir herz ich was sang, kommt seelen unbekannten herauf alten gut freundliche es ein, gezeigt die und und das halbverklungnen mit dem, und ach zu vom strenge ach menge zauberhauch schöne. Verklungen guten ein sich jenem der faßt wirklichkeiten ernsten. Irrcl;et träne schöne irrt mein, weiten und getäuscht einst lieb des. Trüben was tage aus steigen strenge gedränge. Sich nun und lebt."
+  },
+  {
+    "blackquote": "Heart with befell companie and almost girls he. Mote yet been lay longed mothernot when the coffined and, ever favour."
+  },
+  {
+    "code": {
+      "lang": "ts",
+      "data": "\r\n  const regs = {\r\n    title : new RegExp('\\\\[.+\\\\]'),\r\n    url   : new RegExp('\\\\(.+\\\\)'),\r\n  }\r\n  const clean = (str: string): string => {\r\n    return str.substring(1).slice(0, str.length - 2);\r\n  }\r\n  const URL   = clean(regs.url.exec(line)![0]);\r\n  const TITLE = clean(regs.title.exec(line)![0]);\r\n  return {\r\n    [LITERALS_REVERSE[LITERALS.img]]: {\r\n      url   : URL,\r\n      title : TITLE,\r\n    }  \r\n  }"
+    }
+  },
+  {
+    "hr": null
+  },
+  {
+    "img": {
+      "url": "../assets/1648661854936.jpg",
+      "title": "something"
+    }
+  }
+]

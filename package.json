@@ -1,0 +1,15 @@
+{
+  "name": "md-parser",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.23",
+    "typescript": "^4.5.4",
+    "vite": "^2.9.0"
+  }
+}
