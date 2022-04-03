@@ -1,3 +1,5 @@
+import { utils } from './utils'
+
 const enum tags {
   h1 = 'h1',
   h2 = 'h2',
@@ -11,44 +13,37 @@ const enum tags {
   code = 'code',
 }
 
-enum LITERALS_REVERSE {
-  '' = tags.paragraph,
-  '#' = tags.h1,
-  '##' = tags.h2,
-  '###' = tags.h3,
-  '####' = tags.h4,
-  '#####' = tags.h5,
-  '!' = tags.image,
-  '>' = tags.quote,
-  '-' = tags.separator,
-  '`' = tags.code
+const LITERALS: Record<tags, string> = {
+  [tags.paragraph]  : '',
+  [tags.separator]  : '-',
+  [tags.image]      : '!',
+  [tags.quote]      : '>',
+  [tags.code]       : '`',
+  [tags.h1]         : '#',
+  [tags.h2]         : '##',
+  [tags.h3]         : '###',
+  [tags.h4]         : '####',
+  [tags.h5]         : '#####',
 }
 
-const LITERALS: Record<tags, keyof typeof LITERALS_REVERSE> = {
-  h1    : '#',
-  h2    : '##',
-  h3    : '###',
-  h4    : '####',
-  h5    : '#####',
-  p     : '',
-  img   : '!',
-  hr    : '-',
-  code  : '`',
-  blackquote : '>',
-}
+const LITERAL_INVERSE = Object.fromEntries(Object.entries(LITERALS).map(utils.swap));
 
-type StructNode = Partial<Record<tags, unknown>>;
+type StructNode = {
+  type  : tags,
+  value : unknown,
+};
 
-export default class Lexer {
+export default class Onaparse {
 
   private codeBuffer: Array<string> = Array();
 
   private processHeading(line: string): StructNode {
 
-    const header = line.split(" ")[0];
+    const literal = line.split(" ")[0];
 
     return {
-      [LITERALS_REVERSE[header as keyof typeof LITERALS_REVERSE]]: line.slice(header.length).trim()
+      type: LITERAL_INVERSE[literal] as tags,
+      value: line.slice(literal.length).trim()
     }
 
   }
@@ -68,7 +63,8 @@ export default class Lexer {
     const TITLE = clean(regs.title.exec(line)![0]);
 
     return {
-      [LITERALS_REVERSE[LITERALS.img]]: {
+      type: tags.image,
+      value: {
         url   : URL,
         title : TITLE,
       }  
@@ -83,7 +79,8 @@ export default class Lexer {
     line.pop();
 
     return {
-      [LITERALS_REVERSE[LITERALS.code]]: {
+      type: tags.code,
+      value: {
         lang: lang,
         data: line.reduce((acc, cur) => `${ acc }\r\n${ cur }`, String())
       }
@@ -91,7 +88,24 @@ export default class Lexer {
 
   }
 
-  public processFile(data: string): Array<StructNode> {
+  private processPrimitives(line: string, char: string): StructNode {
+
+    switch (char) {
+
+      case LITERALS.hr:
+        return { type: tags.separator, value: null };    
+
+      case LITERALS.blackquote:
+        return { type: tags.quote, value: line.substring(2) };
+
+      default:
+        return { type: tags.paragraph, value: line }
+
+    }
+
+  }
+
+  public parse(data: string): Array<StructNode> {
 
     let buffer: boolean = false;
 
@@ -105,13 +119,14 @@ export default class Lexer {
         : line.charAt(0)
 
       switch (char) {
+
         case LITERALS.h1: 
           result.push(this.processHeading(line)); break;
+
         case LITERALS.img:
           result.push(this.processImage(line)); break;
-        case LITERALS.code: {
 
-          console.log('code case');
+        case LITERALS.code: {
 
           if ( Boolean(line.charAt(2) === LITERALS.code ) ) buffer = !buffer;
 
@@ -120,12 +135,10 @@ export default class Lexer {
           if ( !buffer ) result.push(this.processCode(this.codeBuffer))
 
         } break;
-        case LITERALS.hr:
-          result.push({ [ tags.separator ]: null }); break;
-        case LITERALS.blackquote:
-          result.push({ [ tags.quote ]: line.substring(2).trim() }); break;
+
         default: 
-          result.push({ [ tags.paragraph ]: line.trim() }); break;
+          result.push(this.processPrimitives(line, char)); break;
+
       }
 
     })
