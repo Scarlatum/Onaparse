@@ -59,15 +59,12 @@ export default class Onaparse {
       return str.substring(1).slice(0, str.length - 2);
     }
 
-    const URL   = clean(regs.url.exec(line)![0]);
-    const TITLE = clean(regs.title.exec(line)![0]);
+    const url = clean(regs.url.exec(line)![0]);
+    const alt = clean(regs.title.exec(line)![0]);
 
     return {
       type: tags.image,
-      value: {
-        url   : URL,
-        title : TITLE,
-      }  
+      value: { url, alt }  
     }
 
   }
